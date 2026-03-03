@@ -8,8 +8,8 @@
 Це класичний проєкт «Movie Search» з пошуком, сіткою карток, детальним переглядом у модалці та коректною обробкою станів завантаження/помилок.
 
 ## Технології / стек
-- React (18+)
-- TypeScript (4.x+)
+- React
+- TypeScript
 - Vite (або CRA) + React Strict Mode
 - HTTP-запити: **axios**
 - Сповіщення: **react-hot-toast**
