@@ -10,7 +10,7 @@ import Loader from '../Loader/Loader';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import MovieModal from '../MovieModal/MovieModal';
 
-import type { Movie } from '../../types/movie';
+import type { Movie, FetchMoviesResponse } from '../../types/movie';
 import { fetchMovies } from '../../services/movieService';
 
 function App() {
@@ -18,11 +18,13 @@ function App() {
   const [page, setPage] = useState<number>(1);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const { data, isLoading, isError, isSuccess } = useQuery({
+  // Явно вказуємо типи <FetchMoviesResponse, Error> для useQuery
+  const { data, isLoading, isError, isSuccess } = useQuery<FetchMoviesResponse, Error>({
     queryKey: ['movies', query, page],
     queryFn: () => fetchMovies(query, page),
     enabled: query !== '',
-    placeholderData: keepPreviousData,
+    // У версії v5 keepPreviousData переїхав сюди:
+    placeholderData: keepPreviousData, 
   });
 
   const movies = data?.results ?? [];
