@@ -44,7 +44,7 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const PaginateComponent = (ReactPaginate as unknown as { default?: typeof ReactPaginate }).default || ReactPaginate;
+  const Paginate = (ReactPaginate as unknown as { default?: typeof ReactPaginate }).default || ReactPaginate;
 
   return (
     <div className={css.app}>
@@ -57,7 +57,8 @@ function App() {
       {movies.length > 0 && (
         <>
           <MovieGrid movies={movies} onSelect={setSelectedMovie} />
-          <PaginateComponent
+          
+          <Paginate
             previousLabel={'←'}
             nextLabel={'→'}
             breakLabel={'...'}

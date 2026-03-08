@@ -1,7 +1,6 @@
 import axios from "axios";
 import type { Movie } from "../types/movie";
 
-// Визначаємо інтерфейс відповіді тут, а не імпортуємо його
 export interface FetchMoviesResponse {
   results: Movie[];
   total_pages: number;
