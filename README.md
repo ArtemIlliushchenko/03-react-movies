@@ -1,73 +1,78 @@
 # React + TypeScript + Vite
+# Домашнє завдання 3 – Пошук фільмів (React + TypeScript)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Опис
+Третє домашнє завдання з TypeScript.  
+Практика створення повноцінного пошукового інтерфейсу для фільмів з використанням API TMDB, типізацією всіх компонентів, асинхронних запитів, модального вікна, обробки помилок, лоадера та toast-повідомлень.
 
-Currently, two official plugins are available:
+Це класичний проєкт «Movie Search» з пошуком, сіткою карток, детальним переглядом у модалці та коректною обробкою станів завантаження/помилок.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Технології / стек
+- React
+- TypeScript
+- Vite (або CRA) + React Strict Mode
+- HTTP-запити: **axios**
+- Сповіщення: **react-hot-toast**
+- Портали: `createPortal` (для модального вікна)
+- CSS-модулі (module.css)
+- Асинхронні функції та try/catch/finally
+- Типізація API-відповідей та стану
+- Lazy loading зображень (`loading="lazy"`)
 
-## React Compiler
+## Структура проєкту
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+| Файл / Компонент              | Призначення                              | Основні типи / особливості                              |
+|-------------------------------|------------------------------------------|------------------------------------------------------------------|
+| src/types/movie.ts            | Інтерфейс Movie                          | `id`, `title`, `poster_path`, `backdrop_path`, `overview` тощо   |
+| src/services/movieService.ts  | Запит до TMDB API                        | `fetchMovies(query): Promise<Movie[]>` з типізацією axios       |
+| src/components/App/App.tsx    | Головний компонент                       | `useState<Movie[]>`, `useState<Movie | null>`, обробка пошуку   |
+| src/components/SearchBar      | Форма пошуку                             | `onSubmit: (query: string) => void`, toast при порожньому запиті |
+| src/components/MovieGrid      | Сітка карток фільмів                     | `movies: Movie[]`, `onSelect: (movie: Movie) => void`           |
+| src/components/MovieModal     | Модальне вікно з деталями фільму         | `createPortal`, закриття по Esc / backdrop, `movie: Movie`      |
+| src/components/Loader         | Індикатор завантаження                   | Показується під час запиту                                      |
+| src/components/ErrorMessage   | Повідомлення про помилку                 | Статичний текст при помилці запиту                              |
+| .env                          | Змінні оточення                          | `VITE_TMDB_TOKEN` — ключ доступу до TMDB API                    |
 
-## Expanding the ESLint configuration
+## Основні типи
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```ts
+// src/types/movie.ts
+export interface Movie {
+  id: number;
+  poster_path: string;
+  backdrop_path: string;
+  title: string;
+  overview: string;
+  release_date: string;
+  vote_average: number;
+}
 ```
+## Типізація запиту:
+TypeScriptexport const fetchMovies = async (query: string): Promise<Movie[]> => {
+  const response = await axios.get<{ results: Movie[] }>(
+    "https://api.themoviedb.org/3/search/movie",
+    { params: { ... }, headers: { Authorization: `Bearer ${...}` } }
+  );
+  return response.data.results;
+};
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Функціонал
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Пошук фільмів за назвою через TMDB Search API
+Відображення сітки карток (постер + назва)
+Клік по картці → відкривається модальне вікно з:
+великим фоновим зображенням (backdrop)
+описом, датою виходу, рейтингом
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Закриття модалки: кнопка ×, клік по backdrop, клавіша Esc
+Стани:
+завантаження → показ Loader
+помилка → показ ErrorMessage
+немає результатів → toast.error("No movies found...")
+порожній запит → toast.error("Please enter your search query.")
+
+Powered by TMDB посилання в хедері
+
+## Посилання
+
+Демо [посилання](https://03-react-movies-13gu.vercel.app)
