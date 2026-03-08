@@ -1,5 +1,13 @@
 import axios from "axios";
-import type { FetchMoviesResponse } from "../types/movie";
+import type { Movie } from "../types/movie";
+
+// Визначаємо інтерфейс відповіді тут, а не імпортуємо його
+export interface FetchMoviesResponse {
+  results: Movie[];
+  total_pages: number;
+  total_results: number;
+  page: number;
+}
 
 export const fetchMovies = async (query: string, page: number = 1): Promise<FetchMoviesResponse> => {
   const response = await axios.get<FetchMoviesResponse>(

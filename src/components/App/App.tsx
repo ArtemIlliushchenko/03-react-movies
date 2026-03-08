@@ -10,21 +10,19 @@ import Loader from '../Loader/Loader';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import MovieModal from '../MovieModal/MovieModal';
 
-import type { Movie, FetchMoviesResponse } from '../../types/movie';
-import { fetchMovies } from '../../services/movieService';
+import type { Movie } from '../../types/movie';
+import { fetchMovies, type FetchMoviesResponse } from '../../services/movieService';
 
 function App() {
   const [query, setQuery] = useState<string>('');
   const [page, setPage] = useState<number>(1);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  // Явно вказуємо типи <FetchMoviesResponse, Error> для useQuery
   const { data, isLoading, isError, isSuccess } = useQuery<FetchMoviesResponse, Error>({
     queryKey: ['movies', query, page],
     queryFn: () => fetchMovies(query, page),
     enabled: query !== '',
-    // У версії v5 keepPreviousData переїхав сюди:
-    placeholderData: keepPreviousData, 
+    placeholderData: keepPreviousData,
   });
 
   const movies = data?.results ?? [];
@@ -59,7 +57,6 @@ function App() {
       {movies.length > 0 && (
         <>
           <MovieGrid movies={movies} onSelect={setSelectedMovie} />
-          
           <PaginateComponent
             previousLabel={'←'}
             nextLabel={'→'}
